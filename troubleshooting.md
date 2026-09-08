@@ -62,15 +62,34 @@ yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ grep -n "INSTANCE_ID\|instance_i
 59:      INSTANCE_ID: "app-02"
 62:    container_name: nginx
 
-- Related commit: pending fix
+- Related commit: a3b826e0d370c13dfb0bd2fc59a6e9345169c699
 
 - Remaining uncertainty: unsure if assigning app-02 its correct instance id in the yml file is enough or if there might be remaining mismatch error
 
+ 
 
+## Entry 3 /08/09/2026 / 11:37
+- Symptom: App log reports REDIS_URL on port 6380, but redis's own log shows it running on 6379
 
+- Hypothesis: The redis url is configured to the 
+wrong port inside the app's config file 
 
+- Command or test: grep -rn "REDIS"  docker-compose.yml config
 
+- Actual output: 
+config/app.env:2:REDIS_URL=redis://redis:6380/0
 
+- Failed attempt and what changed your thinking:
+
+- Root cause: config/app.env hardcodes redis_url to port 6380 
+
+- Fix: change REDIS_URL in app.env from redis://redis:6380/0 to redis://redis:6379/0 
+
+- Retest evidence: pending
+
+- Related commit: pending
+
+- Remaining uncertainty: Havent confirmed yet if redis's port number is hardcoded wrongly somewhere else or not.
 
 
 
