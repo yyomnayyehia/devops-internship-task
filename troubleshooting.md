@@ -111,10 +111,11 @@ postgres  | 2026-09-07 17:07:20.496 UTC [1] LOG:  listening on IPv4 address "0.0
 - Fix: Update the DATABASE_URL in app.env to use port 5432 
 
 - Retest evidence:
+app-01  | {"timestamp": "2026-09-08T21:29:48.849+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:5432/barq_tasks", "redis_url": "redis://redis:6379/0"}
 
-- Related commit:
+- Related commit: 10a54cb9be03b0fb3cbef834897fba55d278c19e
 
-- Remaining uncertainty:
+- Remaining uncertainty: port is correct but database still failing
 
 
 
