@@ -85,7 +85,7 @@ config/app.env:2:REDIS_URL=redis://redis:6380/0
 
 - Fix: change REDIS_URL in app.env from redis://redis:6380/0 to redis://redis:6379/0 
 
-- Retest evidence: pending
+- Retest evidence:  app-01  | {"timestamp": "2026-09-08T20:59:37.455+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:5433/barq_tasks", "redis_url": "redis://redis:6379/0"}
 
 - Related commit: pending
 
