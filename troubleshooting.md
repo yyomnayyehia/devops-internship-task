@@ -87,10 +87,34 @@ config/app.env:2:REDIS_URL=redis://redis:6380/0
 
 - Retest evidence:  app-01  | {"timestamp": "2026-09-08T20:59:37.455+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:5433/barq_tasks", "redis_url": "redis://redis:6379/0"}
 
-- Related commit: pending
+- Related commit: 60295ad6f4bf4986f83fd36374a8ba205a6d4911
 
 - Remaining uncertainty: Havent confirmed yet if redis's port number is hardcoded wrongly somewhere else or not.
 
+## Entry 4 / 09/09/2026 / 12:30 
+
+- Symptom: App does not connect to database 
+
+- Hypothesis: mismatch of database configurations in docker-compose.yml or the app.env
+
+- Command or test: docker compose -p barq-assessment logs --no-color | grep -i postgres
+
+- Actual output:
+ app-01  | {"timestamp": "2026-09-08T20:59:37.455+00:00", "level": "INFO", "service": "barq-api", "event": "configuration_loaded", "database_url": "postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:5433/barq_tasks", "redis_url": "redis://redis:6379/0"}
+
+postgres  | 2026-09-07 17:07:20.496 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+
+- Failed attempt and what changed your thinking:
+
+- Root cause: app.env uses port 5433 but postgres listens on 5432
+
+- Fix: Update the DATABASE_URL in app.env to use port 5432 
+
+- Retest evidence:
+
+- Related commit:
+
+- Remaining uncertainty:
 
 
 
