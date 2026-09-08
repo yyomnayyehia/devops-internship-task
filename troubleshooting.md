@@ -28,17 +28,43 @@ app-02     barq-assessment-app-02                                               
 - Remaining uncertainty: The apps are now healthy there might be still underlying issuses 
 
 
-## Entry 2 / date / time
-- Symptom: 
-- Hypothesis:
-- Command or test:
+## Entry 2 / 08/09/2026 / 10:48
+- Symptom: app-02 instance id is app-01 inside its logs report instead of its own identity 
+
+- Hypothesis: wrongly configured in the docker-compose.yml
+
+- Command or test: grep -n "INSTANCE_ID\|instance_id\|container_name" docker-compose.yml
+
 - Actual output:
+yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ grep -n "INSTANCE_ID\|instance_id\|container_name" docker-compose.yml
+21:    container_name: postgres
+39:    container_name: redis
+50:    container_name: app-01
+53:      INSTANCE_ID: "app-01"
+56:    container_name: app-02
+59:      INSTANCE_ID: "app-01"
+62:    container_name: nginx
+
 - Failed attempt and what changed your thinking:
-- Root cause:
-- Fix:
+
+
+- Root cause: Inside the docker-compose.yml file, app-02 is hardcoded to app-01 instead if app-02 
+
+- Fix: Rename app-02's instance ID from app-01 to app-02
+
 - Retest evidence:
-- Related commit:
-- Remaining uncertainty:
+yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ grep -n "INSTANCE_ID\|instance_id\|container_name" docker-compose.yml
+21:    container_name: postgres
+39:    container_name: redis
+50:    container_name: app-01
+53:      INSTANCE_ID: "app-01"
+56:    container_name: app-02
+59:      INSTANCE_ID: "app-02"
+62:    container_name: nginx
+
+- Related commit: pending fix
+
+- Remaining uncertainty: unsure if assigning app-02 its correct instance id in the yml file is enough or if there might be remaining mismatch error
 
 
 
