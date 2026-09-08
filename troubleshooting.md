@@ -91,7 +91,7 @@ config/app.env:2:REDIS_URL=redis://redis:6380/0
 
 - Remaining uncertainty: Havent confirmed yet if redis's port number is hardcoded wrongly somewhere else or not.
 
-## Entry 4 / 09/09/2026 / 12:30 
+## Entry 4 / 09/09/2026 / 12:00
 
 - Symptom: App does not connect to database 
 
@@ -117,6 +117,29 @@ app-01  | {"timestamp": "2026-09-08T21:29:48.849+00:00", "level": "INFO", "servi
 
 - Remaining uncertainty: port is correct but database still failing
 
+
+
+
+## Entry 5 / 09/09/2026 / 12:32
+
+- Symptom: App still fails to connect after port mismatch 
+
+- Hypothesis: The database credentials is wrong
+
+- Command or test: grep -E "POSTGRES_PASSWORD|DATABASE_URL" docker-compose.yml config/app.env
+
+- Actual output:
+docker-compose.yml:      POSTGRES_PASSWORD: BarqLabOnly_7qN2vK8c
+config/app.env:DATABASE_URL=postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:5432/barq_tasks 
+- Failed attempt and what changed your thinking:
+- Root cause: Password for postgres in app.env ends with d while the password in docker-compose.yml ends with C 
+
+- Fix: Update app.env to the correct password from the docker-compose.yml 
+
+- Retest evidence: 
+
+- Related commit:
+- Remaining uncertainty:
 
 
 
