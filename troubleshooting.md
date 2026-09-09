@@ -237,8 +237,18 @@ yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ curl http://127.0.0.1:8080
 - Root cause: APP_HOST is set to 127.0.0.1 which overrides the defualt settings of the flask app to 0.0.0.0 preventing them from accepting connections
 - Fix: Correct APP_HOST in docker-compose.yml from 127.0.0.1 to 0.0.0.0
 - Retest evidence:
+<!-- HTTP/1.1 200 OK
+Server: nginx/1.28.3
+Date: Wed, 09 Sep 2026 13:19:18 GMT
+Content-Type: application/json
+Content-Length: 100
+Connection: keep-alive
+X-Instance-ID: app-02
+X-Request-ID: dd29686c7a747a7d6f857bf166b5f75e
+Cache-Control: no-store
+{"instance_id":"app-02","message":"Welcome to BARQ Systems","service":"barq-api","version":"2.0.0"} -->
 - Related commit:
-- Remaining uncertainty: 
+- Remaining uncertainty:  none
 
 
 
