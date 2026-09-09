@@ -220,8 +220,31 @@ yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ curl http://127.0.0.1:8080
 <hr><center>nginx/1.28.3</center>
 </body>
 </html> -->
-- Related commit:
+- Related commit: 79079b6e741e09bad0dc8c49267f127d68cfe3b2
 - Remaining uncertainty: Nginx still fails even after fixing upstream
+
+
+
+## Entry 8 / 09/09/2026 / 4:01
+- Symptom: NGINX returns a 502 Bad Gateway error because it cannot connect to the upstream Flask apps.
+- Hypothesis: docker-compose.yml is passing APP_HOST:127.0.0.1 while app-01 and app-02 have default setting of 0.0.0.0
+- Command or test:  grep -rn "run(" app/server.py
+ grep -rn "run(" app/server.py
+- Actual output:
+144:    create_app().run(host=os.getenv("APP_HOST", "0.0.0.0"),
+  APP_HOST: "127.0.0.1"
+- Failed attempt and what changed your thinking:
+- Root cause: APP_HOST is set to 127.0.0.1 which overrides the defualt settings of the flask app to 0.0.0.0 preventing them from accepting connections
+- Fix: Correct APP_HOST in docker-compose.yml from 127.0.0.1 to 0.0.0.0
+- Retest evidence:
+- Related commit:
+- Remaining uncertainty: 
+
+
+
+
+
+
 
 
 
