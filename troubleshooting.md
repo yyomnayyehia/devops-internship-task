@@ -227,15 +227,23 @@ yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ curl http://127.0.0.1:8080
 
 ## Entry 8 / 09/09/2026 / 4:01
 - Symptom: NGINX returns a 502 Bad Gateway error because it cannot connect to the upstream Flask apps.
+
 - Hypothesis: docker-compose.yml is passing APP_HOST:127.0.0.1 while app-01 and app-02 have default setting of 0.0.0.0
-- Command or test:  grep -rn "run(" app/server.py
+
+- Command or test:  
+grep -rn "run(" app/server.py
  grep -rn "run(" app/server.py
+
 - Actual output:
 144:    create_app().run(host=os.getenv("APP_HOST", "0.0.0.0"),
   APP_HOST: "127.0.0.1"
+
 - Failed attempt and what changed your thinking:
+
 - Root cause: APP_HOST is set to 127.0.0.1 which overrides the defualt settings of the flask app to 0.0.0.0 preventing them from accepting connections
+
 - Fix: Correct APP_HOST in docker-compose.yml from 127.0.0.1 to 0.0.0.0
+
 - Retest evidence:
 <!-- HTTP/1.1 200 OK
 Server: nginx/1.28.3
@@ -247,14 +255,38 @@ X-Instance-ID: app-02
 X-Request-ID: dd29686c7a747a7d6f857bf166b5f75e
 Cache-Control: no-store
 {"instance_id":"app-02","message":"Welcome to BARQ Systems","service":"barq-api","version":"2.0.0"} -->
-- Related commit:
+
+- Related commit: d269576d0ccb97d6002ca929b24a19ca48aebecf
+
 - Remaining uncertainty:  none
 
 
+## Entry 9 / 10/09/2026 / 12:00
+- Symptom: A record created with POST/records disappears after the postgres container is restarted
 
+- Hypothesis: The named vollume is not actaully storing PostgreSQL's  data
+- Command or test:
+  curl -X POST http://127.0.0.1:8080/records -H "Content-Type: application/json" -d '{"title":"postgre-test"}'
+curl http://127.0.0.1:8080/records
+docker compose -p barq-assessment restart postgres
+sleep 10
+curl http://127.0.0.1:8080/records
+- Actual output:
+{"instance_id":"app-01","record":{"id":4,"title":"postgre-test"},"service":"barq-api","version":"2.0.0"}
+{"instance_id":"app-01","records":[{"id":1,"title":"Review service readiness"},{"id":2,"title":"Document the operating procedure"},{"id":3,"title":"postgre-test"},{"id":4,"title":"postgre-test"}],"service":"barq-api","version":"2.0.0"}
+[+] restart 0/1
+ ⠼ Container postgres Restarting                                        0.4s
+{"instance_id":"app-01","records":[{"id":1,"title":"Review service readiness"},{"id":2,"title":"Document the operating procedure"}],"service":"barq-api","version":"2.0.0"}
 
+- Failed attempt and what changed your thinking: At first got error for postgre being not available because of the immediate curl right after restarting, but after adding sleep 10 to allow time for postgre to fully boot up the error was gone.
 
+- Root cause: The path postgre service uses for live data was set to /var/lib/postgresql/backup which is not what postgre uses and the actual directory /var/lib/postgresql/data is set as tmpfs which stores data in RAM causing the data to be wiped up on every container restart.
 
+- Fix: Remove the tmpfs for /var/lib/postgresql/data and change /var/lib/postgresql/backup to /var/lib/postgresql/data
+
+- Retest evidence:
+- Related commit:
+- Remaining uncertainty: 
 
 
 
