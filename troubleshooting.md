@@ -285,6 +285,13 @@ curl http://127.0.0.1:8080/records
 - Fix: Remove the tmpfs for /var/lib/postgresql/data and change /var/lib/postgresql/backup to /var/lib/postgresql/data
 
 - Retest evidence:
+curl http://127.0.0.1:8080/records
+{"instance_id":"app-01","record":{"id":3,"title":"postgre-test"},"service":"barq-api","version":"2.0.0"}
+{"instance_id":"app-01","records":[{"id":1,"title":"Review service readiness"},{"id":2,"title":"Document the operating procedure"},{"id":3,"title":"postgre-test"}],"service":"barq-api","version":"2.0.0"}
+[+] restart 0/1
+ ⠴ Container postgres Restarting                                                                                                                        0.5s
+{"instance_id":"app-01","records":[{"id":1,"title":"Review service readiness"},{"id":2,"title":"Document the operating procedure"},{"id":3,"title":"postgre-test"}],"service":"barq-api","version":"2.0.0"}
+
 - Related commit:
 - Remaining uncertainty: 
 
