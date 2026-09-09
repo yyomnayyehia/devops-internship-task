@@ -212,8 +212,16 @@ http {
 - Root cause: nginx.conf incorrectly configures the upstream for app-01 to port 8081 when it is supposed to be 8080
 - Fix: Correct the upstream for app-01 from port 8081 to port 8080
 - Retest evidence:
+yomna@LAPTOP-KLHNR2J1:~/devops-internship-task$ curl http://127.0.0.1:8080
+<!-- <html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>nginx/1.28.3</center>
+</body>
+</html> -->
 - Related commit:
-- Remaining uncertainty: Unsure if there is still remaining misconfigurations for nginx
+- Remaining uncertainty: Nginx still fails even after fixing upstream
 
 
 
