@@ -176,18 +176,44 @@ Content-Type: text/html
 Content-Length: 157
 Connection: keep-alive
 
-<html>
+<!-- <html>
 <head><title>502 Bad Gateway</title></head>
 <body>
 <center><h1>502 Bad Gateway</h1></center>
 <hr><center>nginx/1.28.3</center>
 </body>
-</html>
+</html> -->
+- Related commit: fde1f35a5c37a2e352cfa95955df017d35b50ca2
+- Remaining uncertainty: Nginx port fix allowed the request to reach NGINX but still an issue remains as NGINX failed to get a valid response "502 bad gateaway"
 
+
+## Entry 7 / 09/09/2026 / 3:42
+- Symptom: curl http://127.0.0.1:8080 returns a 502 Bad Gateway error from NGINX.
+
+- Hypothesis: Nginx failing to forward traffic because of port mismatch
+- Command or test: cat nginx/nginx.conf docker-compose.yml
+- Actual output:
+worker_processes auto;
+error_log /dev/stderr warn;
+pid /var/run/nginx.pid;
+events { worker_connections 1024; }
+http {
+    include /etc/nginx/mime.types;
+    log_format assessment escape=json '{"timestamp":"$time_iso8601","service":"edge","request_id":"$request_id","method":"$request_method","path":"$uri","status":$status,"upstream":"$upstream_addr","upstream_status":"$upstream_status","request_time":"$request_time"}';
+    access_log /dev/stdout assessment;
+    upstream application_pool {
+        server app-01:8081 max_fails=0;
+        server app-02:8080 max_fails=0;
+    }
+    server {
+        listen 80;
+
+- Failed attempt and what changed your thinking: Once the docker port mapping was fixed in the previous step I got a 502 error. This proved NGINX was reachable but the backend wasn't so I checked the upstream block inside nginx.conf 
+- Root cause: nginx.conf incorrectly configures the upstream for app-01 to port 8081 when it is supposed to be 8080
+- Fix: Correct the upstream for app-01 from port 8081 to port 8080
+- Retest evidence:
 - Related commit:
-- Remaining uncertainty: Nginx port fix allowed the request to reach NGINX but still an issue remains as NGINX failed to get a valid response "502 bas gateaway"
-
-
+- Remaining uncertainty: Unsure if there is still remaining misconfigurations for nginx
 
 
 
