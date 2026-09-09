@@ -167,9 +167,25 @@ nginx:
 - Fix: Change the nginx port mapping in docker-compose.yml from ["127.0.0.1:${PUBLIC_PORT:-8080}:81"] to ["127.0.0.1:${PUBLIC_PORT:-8080}:80"]
 
 - Retest evidence:
-- Related commit:
-- Remaining uncertainty: Not sure if NGINX is fully working or if there is remaining misconfigurations 
 
+curl -i http://127.0.0.1:8080/
+HTTP/1.1 502 Bad Gateway
+Server: nginx/1.28.3
+Date: Wed, 09 Sep 2026 12:32:28 GMT
+Content-Type: text/html
+Content-Length: 157
+Connection: keep-alive
+
+<html>
+<head><title>502 Bad Gateway</title></head>
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>nginx/1.28.3</center>
+</body>
+</html>
+
+- Related commit:
+- Remaining uncertainty: Nginx port fix allowed the request to reach NGINX but still an issue remains as NGINX failed to get a valid response "502 bas gateaway"
 
 
 
