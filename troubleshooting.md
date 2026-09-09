@@ -140,8 +140,38 @@ config/app.env:DATABASE_URL=postgresql://barq_app:BarqLabOnly_7qN2vK8d@postgres:
 docker-compose.yml:      POSTGRES_PASSWORD: BarqLabOnly_7qN2vK8c
 config/app.env:DATABASE_URL=postgresql://barq_app:BarqLabOnly_7qN2vK8c@postgres:5432/barq_tasks
 
-- Related commit:
+- Related commit: e82e12a200050ce43917da2fd615788415a182bb
+
 - Remaining uncertainty: None for database connection
+
+
+
+## Entry 6  / 09/09/2026 / 3:00 
+- Symptom: All requests to http://127.0.0.1:8080 fail with curl error 
+
+- Hypothesis: nginx container not running or port mapping in the docker-compose.yml does not match NGINX configuration
+
+- Command or test: docker compose -p barq-assessment ps -a
+grep -A 10 "nginx:" docker-compose.yml
+
+- Actual output:
+nginx      nginx:1.28-alpine@sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236    "/docker-entrypoint.…"   nginx      43 hours ago     Up 22 minutes             127.0.0.1:8080->81/tcp
+
+nginx:
+    image: nginx:1.28-alpine@sha256:a8b39bd9cf0f83869a2162827a0caf6137ddf759d50a171451b335cecc87d236
+    container_name: nginx
+    ports: ["127.0.0.1:${PUBLIC_PORT:-8080}:81"]
+- Failed attempt and what changed your thinking:
+- Root cause: Docker-compose.yml maps host port 8080 to container port 8081 but nginx.conf congfigures NGINX to listen on port 8080
+
+- Fix: Change the nginx port mapping in docker-compose.yml from ["127.0.0.1:${PUBLIC_PORT:-8080}:81"] to ["127.0.0.1:${PUBLIC_PORT:-8080}:80"]
+
+- Retest evidence:
+- Related commit:
+- Remaining uncertainty: Not sure if NGINX is fully working or if there is remaining misconfigurations 
+
+
+
 
 
 
