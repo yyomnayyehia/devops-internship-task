@@ -292,8 +292,50 @@ curl http://127.0.0.1:8080/records
  ⠴ Container postgres Restarting                                                                                                                        0.5s
 {"instance_id":"app-01","records":[{"id":1,"title":"Review service readiness"},{"id":2,"title":"Document the operating procedure"},{"id":3,"title":"postgre-test"}],"service":"barq-api","version":"2.0.0"}
 
-- Related commit:
+- Related commit: b1927fb678d51014299942c61280e0b1c7ff0897
 - Remaining uncertainty: 
+
+
+
+
+## Entry 10 / 12/09/2026 / 11:30
+
+- Symptom: Redis counter resets to 0 when Redis counter restarts 
+
+- Hypothesis: Redis presistence disabled in configuration 
+- Command or test:  grep -A 7 "redis:" docker-compose.yml
+- Actual output:
+is:
+    image: redis:7.4-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    container_name: redis
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports: ["127.0.0.1:16379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 2s
+- Failed attempt and what changed your thinking:
+- Root cause: The command override disables Redis snapshotting and append-only log
+- Fix: Change appendonly from no to yes and add  a named volume so data survives recreation of container
+- Retest evidence:
+  redis:
+    image: redis:7.4-alpine@sha256:ff02b58f971e7d7d156a1267e283fcbbeee91773b6aa36c49dac28ecfe28eadf
+    container_name: redis
+    command: ["redis-server",  "--appendonly", "yes"]
+    ports: ["127.0.0.1:16379:6379"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+- Related commit:
+- Remaining uncertainty:
+
+
+
+
+
+
+
 
 
 
