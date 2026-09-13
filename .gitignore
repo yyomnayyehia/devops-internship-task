@@ -3,6 +3,7 @@ __pycache__/
 .venv/
 .env
 .env.*
+config/app.env
 !.env.example
 .DS_Store
 Thumbs.db
