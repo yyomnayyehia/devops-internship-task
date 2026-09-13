@@ -327,7 +327,7 @@ is:
       - redis-data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-- Related commit:
+- Related commit:708fc42e176bcd389df40cb15b04e09d039ecf36
 - Remaining uncertainty:
 
 

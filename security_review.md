@@ -54,14 +54,17 @@ root
 
 
 ### 6. Secrets exposed via Git tracking and Docker image layers
-- Risk and evidence: app.env tracked in git and not in .gitignore when it contains sensitive credentials and the Docker file bakes the app.env into every image built making the credentials easy to extract from image layers
+- Risk and evidence: the original `config/app.env` contained database credentials, and the Dockerfile copied that file into every image layer. Anyone with repository or image access could extract the credentials.
 
-- Impact: A public repo would cause anyone to access them and anyone with access to build image can extract the credentials 
+- Impact: exposed credentials could allow unauthorized access to PostgreSQL and would remain recoverable from Git history or image layers.
 
-- Implemented fix / commit: Ran git rm --cached config/app.env to stop tracking it going forward. The docker file was not fixed as they are lab only data
+- Implemented fix / commit: removed `config/app.env` from the Compose/Docker build path, removed the Dockerfile copy step, added `.env` to `.gitignore`, and moved runtime values to the ignored local `.env` file. `.env.example` contains placeholders only.
 
-- Production follow-up: Would have to change the credentials and scrub it from git history and for the docker file delete copy of app.env and use env vars 
-- How to verify:git ls-files | grep "app.env" 
+- Production follow-up: rotate any credentials that were previously committed and scrub them from public Git history if this repository is ever published. Use a secrets manager for production deployments.
+- How to verify:
+  `git ls-files config/app.env` returns no output.
+  `git grep -n 'POSTGRES_PASSWORD' -- Dockerfile docker-compose.yml .env.example` shows only variable references or the safe placeholder.
+  `docker history <app-image>` contains no application environment file.
 
 
 
