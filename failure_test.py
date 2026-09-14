@@ -22,7 +22,7 @@ def send_traffic(requests=50):
     stats = {"app-01": 0, "app-02": 0, "errors": 0}
     for _ in range(requests):
         try:
-            resp = urllib.request.urlopen("http://127.0.0.1:8080/instance", timeout=CLIENT_TIMEOUT)
+            resp = urllib.request.urlopen("http://127.0.0.1:8090/instance", timeout=CLIENT_TIMEOUT)
             data = json.loads(resp.read().decode())
             instance = data.get("instance_id")
             if instance in stats:
@@ -65,7 +65,7 @@ print("app-01 started. Polling until it receives traffic again...")
 recovered = False
 for _ in range(30):
     try:
-        resp = urllib.request.urlopen("http://127.0.0.1:8080/instance", timeout=CLIENT_TIMEOUT)
+        resp = urllib.request.urlopen("http://127.0.0.1:8090/instance", timeout=CLIENT_TIMEOUT)
         data = json.loads(resp.read().decode())
         if data.get("instance_id") == "app-01":
             recovered = True

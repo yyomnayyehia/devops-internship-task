@@ -47,3 +47,4 @@ chmod +x backup.sh restore.sh
 ```bash
 docker compose down -v
 ```
+![Architecture Diagram](docs/architecture.png)
