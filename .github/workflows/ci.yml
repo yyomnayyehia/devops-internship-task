@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "Waiting for /health to respond..."
           for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:8080/health > /dev/null; then
+            if curl -sf http://127.0.0.1:8090/health > /dev/null; then
               echo "Service is healthy."
               break
             fi
@@ -57,7 +57,7 @@ jobs:
 
           echo "Waiting for /ready to reflect real dependency health..."
           for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:8080/ready > /dev/null; then
+            if curl -sf http://127.0.0.1:8090/ready > /dev/null; then
               echo "Dependencies are ready."
               break
             fi

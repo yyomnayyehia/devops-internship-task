@@ -21,7 +21,7 @@ ready = False
 print("Waiting for environment to become ready...")
 for _ in range(max_retries):
     try:
-        urllib.request.urlopen("http://127.0.0.1:8080/health", timeout=2)
+        urllib.request.urlopen("http://127.0.0.1:8090/health", timeout=2)
         ready = True
         break
     except Exception:
@@ -35,7 +35,7 @@ print_pass("Environment is up and responding.")
 endpoints = ["/", "/health", "/ready", "/records", "/counter", "/instance"]
 for ep in endpoints:
     try:
-        urllib.request.urlopen(f"http://127.0.0.1:8080{ep}", timeout=2)
+        urllib.request.urlopen(f"http://127.0.0.1:8090{ep}", timeout=2)
         print_pass(f"Endpoint {ep} is accessible.")
     except Exception as e:
         print_fail(f"Endpoint {ep} failed: {e}")
@@ -44,7 +44,7 @@ for ep in endpoints:
 seen = set()
 for _ in range(10):
     try:
-        resp = urllib.request.urlopen("http://127.0.0.1:8080/instance", timeout=2)
+        resp = urllib.request.urlopen("http://127.0.0.1:8090/instance", timeout=2)
         data = json.loads(resp.read().decode())
         if "instance_id" in data:
             seen.add(data["instance_id"])
@@ -60,7 +60,7 @@ else:
 print("Testing PostgreSQL write via /records...")
 try:
     req = urllib.request.Request(
-        "http://127.0.0.1:8080/records",
+        "http://127.0.0.1:8090/records",
         data=json.dumps({"title": "validate-script-record"}).encode(),
         headers={'Content-Type': 'application/json'}
     )
@@ -76,7 +76,7 @@ except Exception as e:
 
 print("Testing Redis write via /counter...")
 try:
-    resp = urllib.request.urlopen("http://127.0.0.1:8080/counter", timeout=2)
+    resp = urllib.request.urlopen("http://127.0.0.1:8090/counter", timeout=2)
     data = json.loads(resp.read().decode())
     if "counter" in data:
         print_pass("Redis write successful.")
@@ -87,7 +87,7 @@ except Exception as e:
 
 print("Testing /ready reflects real dependency status...")
 try:
-    resp = urllib.request.urlopen("http://127.0.0.1:8080/ready", timeout=2)
+    resp = urllib.request.urlopen("http://127.0.0.1:8090/ready", timeout=2)
     data = json.loads(resp.read().decode())
 
     expected = {

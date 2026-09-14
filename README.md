@@ -21,12 +21,12 @@ docker compose stop        # stop without deleting data
 
 ## Test Endpoints
 ```bash
-curl http://127.0.0.1:8080/
-curl http://127.0.0.1:8080/health
-curl http://127.0.0.1:8080/ready
-curl http://127.0.0.1:8080/records
-curl http://127.0.0.1:8080/counter
-curl http://127.0.0.1:8080/instance
+curl http://127.0.0.1:8090/
+curl http://127.0.0.1:8090/health
+curl http://127.0.0.1:8090/ready
+curl http://127.0.0.1:8090/records
+curl http://127.0.0.1:8090/counter
+curl http://127.0.0.1:8090/instance
 ```
 
 ## Run Validation
