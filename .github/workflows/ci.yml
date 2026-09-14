@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create .env from example
+        run: |
+          cp .env.example .env
+          sed -i 's/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=ci-throwaway-password/' .env
+          cat .env
+
+      - name: Python syntax check
+        run: |
+          python3 -m py_compile app/server.py validate.py failure_test.py
+
+      - name: Shell script syntax check
+        run: |
+          bash -n backup.sh
+          bash -n restore.sh
+
+      - name: Validate docker-compose.yml syntax
+        run: docker compose -p barq-assessment config -q
+
+      - name: Build images
+        run: docker compose -p barq-assessment build
+
+      - name: Start the stack
+        run: docker compose -p barq-assessment up -d
+
+      - name: Show container status
+        if: always()
+        run: docker compose -p barq-assessment ps -a
+
+      - name: Wait for readiness
+        run: |
+          echo "Waiting for /health to respond..."
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8080/health > /dev/null; then
+              echo "Service is healthy."
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Service did not become healthy in time."
+              exit 1
+            fi
+            sleep 2
+          done
+
+          echo "Waiting for /ready to reflect real dependency health..."
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:8080/ready > /dev/null; then
+              echo "Dependencies are ready."
+              break
+            fi
+            if [ "$i" -eq 30 ]; then
+              echo "Dependencies did not become ready in time."
+              exit 1
+            fi
+            sleep 2
+          done
+
+      - name: Run validation
+        run: python3 validate.py
+
+      - name: Run failure/recovery test
+        run: python3 failure_test.py
+
+      - name: Dump container logs on failure
+        if: failure()
+        run: docker compose -p barq-assessment logs --no-color
+
+      - name: Tear down
+        if: always()
+        run: docker compose -p barq-assessment down
