@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app
+  namespace: barq
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: app
+          image: yomnayehia/barq-app:1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: APP_HOST
+              value: "0.0.0.0"
+            - name: APP_PORT
+              value: "8080"
+            - name: APP_MESSAGE
+              value: "Welcome to BARQ Systems"
+            - name: INSTANCE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql://barq_app:$(POSTGRES_PASSWORD)@postgres:5432/barq_tasks"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+          resources:
+            requests:
+              memory: 64Mi
+            limits:
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app
+  namespace: barq
+spec:
+  selector:
+    app: app
+  ports:
+    - port: 8080
+      targetPort: 8080
